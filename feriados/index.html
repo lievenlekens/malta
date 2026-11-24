@@ -104,7 +104,7 @@ details p{margin:12px 0 0;font-size:16px;line-height:1.7}
 <div style="max-width: 760px">
 <span style="display: inline-block; background: #F9C931; color: #01526B; font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 8px 18px; border-radius: 999px">In samenwerking met Feriados</span>
 <h2 class="amatic" style="margin: 16px 0 8px; font-size: 64px; color: #01526B">Winterreizen naar Malta</h2>
-<p style="margin: 0; font-size: 17px; line-height: 1.6">Vlucht en hotel, met de voordeligste vertrekdag tussen november en maart. Prijs per persoon bij 2 personen.</p>
+<p style="margin: 0; font-size: 17px; line-height: 1.6">Vlucht en hotel in een vier- of vijfsterrenhotel, met de voordeligste vertrekdag tussen november en maart. Prijs per persoon bij 2 personen.</p>
 </div>
 <img src="img/logo-feriados.png" alt="Feriados" style="height: 48px; width: auto; display: block">
 </div>
@@ -181,6 +181,8 @@ details p{margin:12px 0 0;font-size:16px;line-height:1.7}
   function toonReizen(reizen){
     var box=document.getElementById('reizenlijst');box.innerHTML='';
     if(!Array.isArray(reizen)||!reizen.length){box.appendChild(el('p','laden','Bekijk de actuele reizen op feriados.be.'));return null;}
+    reizen=reizen.filter(function(r){return (getal(r.sterren)||0)>=4;});
+    if(!reizen.length){box.appendChild(el('p','laden','Bekijk de actuele reizen op feriados.be.'));return null;}
     reizen=reizen.slice().sort(function(a,b){return (getal(a.prijs)||1e9)-(getal(b.prijs)||1e9);});
     reizen.slice(0,12).forEach(function(r){
       var url=veilig(r.url)||'https://www.feriados.be/visitmalta';
@@ -216,8 +218,9 @@ details p{margin:12px 0 0;font-size:16px;line-height:1.7}
     var min=toonReizen(d.reizen);
     if(min!=null){
       document.querySelector('[data-vanaf-hero]').textContent='vanaf '+euro(min)+' p.p.';
-      document.querySelector('[data-vanaf-faq]').textContent='vanaf '+euro(min);
     }
+    var alle=(d.reizen||[]).map(function(r){return getal(r.prijs);}).filter(function(n){return n!=null;});
+    if(alle.length)document.querySelector('[data-vanaf-faq]').textContent='vanaf '+euro(Math.min.apply(null,alle));
     if(d.bijgewerkt){var t=new Date(d.bijgewerkt);document.getElementById('bijgewerkt').textContent=', bijgewerkt op '+(isNaN(t)?d.bijgewerkt:t.toLocaleDateString('nl-BE',{day:'numeric',month:'long',year:'numeric'}));}
   }).catch(function(){
     var box=document.getElementById('reizenlijst');box.innerHTML='';
